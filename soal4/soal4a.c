@@ -12,7 +12,7 @@
 
 void *multiply( void *ptr );
 
-void main()
+void main(int argc, char *argv[])
 {
     key_t key = 1234;
     unsigned long long int *res;
