@@ -12,7 +12,7 @@
 
 void *multiply( void *ptr );
 
-void main(int argc, char *argv[])
+int main()
 {
     key_t key = 1234;
     unsigned long long int *res;
@@ -47,7 +47,6 @@ void main(int argc, char *argv[])
         {
             for (j = 0; j < Y; j++)
             {
-                void *ress;
                 int arr[2] = {number1[i][j], number2[j][k]};
 
                 iret[i][k][j] = pthread_create(&threads[i][k][j], NULL, multiply, (void*) arr);
@@ -58,18 +57,31 @@ void main(int argc, char *argv[])
                     exit(EXIT_FAILURE);
                 }
                 
-                pthread_join(threads[i][k][j], &ress);
-                printf("%d %d - %d %d -> %d %llu\n", i, j, j, k, (int)ress, res[k* X2 + i]);
-                res[k*X2 + i] += (int)ress;
             }    
         }
     }
+
+    for ( i = 0; i < X1; i++)
+    {
+        for ( k = 0; k < X2; k++)
+        {
+            for ( j = 0; j < Y; j++)
+            {
+                void *ress;
+                pthread_join(threads[i][k][j], &ress);
+                // printf("%d %d - %d %d -> %d %llu\n", i, j, j, k, (int)ress, res[k* X2 + i]);
+                res[k*X2 + i] += (int)ress;
+            }
+            
+        }
+    }
+    
 
     for (i = 0; i < X1; i++)
     {
         for ( j = 0; j < X2 - 1; j++)
         {
-            printf("%llu ", res[j * X2 + i]);
+            printf("%llu\t", res[j * X2 + i]);
         }
         printf("%llu\n", res[j * X2 + X1 - 1]);
     }
