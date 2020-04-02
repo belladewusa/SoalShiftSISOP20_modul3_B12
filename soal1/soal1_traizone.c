@@ -134,7 +134,7 @@ void *cariPokemon(void * ptr) {
             is_capture_mode = TRUE;
             is_first_encounter = TRUE;
             
-            puts("Menemukan Pokemon!!");
+            puts("\nMenemukan Pokemon!!");
             
             encountered_pokemon[0] = shared_array[INDEX_X_POKEMON];
             encountered_pokemon[1] = shared_array[INDEX_Y_POKEMON];
@@ -153,12 +153,12 @@ void * pokemonRun(void *ptr) {
     {
         sleep(20);
         
-        if(!is_capture_mode) break;
+        if(!is_capture_mode) return NULL;
 
         int random_number = rand() % 100;
 
         if(random_number < shared_array[OLD_ESCAPE_RATE]) {
-            puts("Pokemon melarikan diri");
+            puts("\nPokemon melarikan diri");
             
             is_capture_mode = FALSE;
 
@@ -174,21 +174,26 @@ void * pokemonThread(void * ptr) {
     while (TRUE)
     {
         sleep(10);
+        // sleep(1000);
+
+        if(!pokemon_owned[index]) return NULL;
 
         if(!is_capture_mode) affection_point[index] -= 10;
+        // printf("AF -> %d", affection_point[index]);
 
         if(affection_point[index] <= 0) {
             int random_number = rand() % 100;
 
             if(random_number < 90) {
-                printf("Pokemon %s dengan index %d terlepas\n", pokemon[index_pokemon[index][0]][index_pokemon[index][1]], index);
+                printf("\nPokemon %s dengan index %d terlepas\n", pokemon[index_pokemon[index][0]][index_pokemon[index][1]], index);
 
                 pokemon_owned[index] = FALSE;
                 count_pokemon_owned--;
+                return NULL;
             }else affection_point[index] = 50;
-            return NULL;
         }
     }
+    return NULL;
 }
 
 int main() {
@@ -215,8 +220,7 @@ int main() {
     shared_array = shmat(shmid, NULL, 0);
 
     while (TRUE)
-    {
-                        
+    {        
         printf("\nPokedollar dimiliki : %d\nPokemon dimiliki : %d\nItem dimiliki : %d\n", pokedollar_owned, count_pokemon_owned, item_owned[BERRY] + item_owned[LULLABY_POWDER] + item_owned[POKEBALL]);
         if(!is_capture_mode) {
             puts("Menu :");
@@ -233,6 +237,7 @@ int main() {
             switch (input_num)
             {
             case CARI_POKEMON:
+                putchar('\n');
                 if(is_cari_pokemon) {
                     puts("Sedang dalam mode mencari");
                     continue;
@@ -254,6 +259,7 @@ int main() {
 
                 break;
             case BERHENTI_MENCARI:
+                putchar('\n');
                 if(!is_cari_pokemon) {
                     puts("Tidak sedang dalam mode mencari");
                     continue;
@@ -263,6 +269,7 @@ int main() {
 
                 break;
             case POKEDEX:
+                putchar('\n');
                 if(count_pokemon_owned < 1) {
                     puts("Tidak ada pokemon yang dimiliki");
                     continue;
@@ -271,11 +278,11 @@ int main() {
                 for ( i = 0; i < 7; i++)
                 {
                     if(pokemon_owned[i]) {
-                        printf("%d. Pokemon : %s | AP : %d\n", i, pokemon[index_pokemon[i][0]][index_pokemon[i][1]], affection_point[i]);
+                        printf("%d.Pokemon : %s | AP : %d\n", i, pokemon[index_pokemon[i][0]][index_pokemon[i][1]], affection_point[i]);
                     }
                 }
 
-                puts("Menu :\n1.Lepas Pokemon\n2.Beri Berry");
+                puts("Menu :\n1.Lepas Pokemon\n2.Beri Berry\n(Untuk keluar beri masukan lain)");
                 printf("Input : ");
 
                 gets(input);
@@ -286,14 +293,18 @@ int main() {
                 switch (input_num)
                 {
                 case LEPAS_POKEMON:
-                    puts("Masukkan index dari pokemon yang ingin dilepas (Masukkan index selain angka itu untuk keluar)");
+                    puts("Masukkan index dari pokemon yang ingin dilepas \n(Masukkan index selain angka itu untuk keluar)");
                     printf("Index : ");
                     
                     int num;
                     scanf("%d", &num);
+                    getchar();
+                    if(is_capture_mode) continue;
 
-                    if(num > 6 || num < 0 || !pokemon_owned[num])
+                    if(num > 6 || num < 0 || !pokemon_owned[num]){
+                        puts("Input salah");
                         continue;
+                    }
 
                     pokedollar_owned += pokedollar_pokemon_owned[num];
 
@@ -303,7 +314,8 @@ int main() {
 
                     break;
                 case BERI_BERRY:
-                    if(item_owned[BERRY] > 0) {
+                    putchar('\n');
+                    if(item_owned[BERRY] < 1) {
                         puts("Anda Tidak Memiliki Berry");
                         continue;
                     }
@@ -318,15 +330,17 @@ int main() {
                     
                     break;
                 default:
-                    puts("Input salah");
+                    if(!is_capture_mode) puts("Input salah");
                     break;
                 }
                 
                 break;
             case SHOP:
+                putchar('\n');
+                puts("Item yang kamu miliki :");
                 for ( i = 0; i < 3; i++)
                     printf("%s Jumlah : %d\n", item[i], item_owned[i]);
-
+                putchar('\n');
                 puts("Shop :");
                 for ( i = 0; i < 3; i++)
                 {
@@ -337,8 +351,10 @@ int main() {
                 
                 int index_item, jumlah;
                 scanf("%d %d", &index_item, &jumlah);
+                getchar();
+                if(is_capture_mode) continue;
 
-                if(index_item < 0 || index_item > 2 || shared_array[index_item] < jumlah || (item_owned[index_item] + jumlah >= 99) || ((jumlah * item_cost[index_item]) > pokedollar_owned )){
+                if(index_item < 0 || index_item > 2 || shared_array[index_item] < jumlah || (item_owned[index_item] + jumlah > 99) || ((jumlah * item_cost[index_item]) > pokedollar_owned ) || jumlah < 1){
                     puts("Input salah atau item di store kurang atau jumlah item yang akan dimiliki terlalu banyak atau Pokedollar anda kurang");
                     continue;
                 }
@@ -347,8 +363,8 @@ int main() {
                 shared_array[index_item] -= jumlah;
                 pokedollar_owned -= (jumlah * item_cost[index_item]);
 
+                // testingSharedArray();
                 break;
-                testingSharedArray();
             default:
                 if(!is_capture_mode) puts("Input salah");
                 break;
@@ -367,17 +383,19 @@ int main() {
                 is_first_encounter = FALSE;
             }
 
-            
-            puts("Menu :");
+            printf("Escape Rate : %d/100 \nCapture Rate : %d/100 ", shared_array[OLD_ESCAPE_RATE], shared_array[OLD_CAPTURE_RATE]);
+            puts("\nMenu :");
             puts("1.Tangkap\n2.Item\n3.Keluar dari capture");
             printf("Input (tuliskan menu) : ");
 
             gets(input);
+            if(!is_capture_mode) continue;
             input_num = checkInput(input);
 
             switch (input_num)
             {
             case TANGKAP:
+                putchar('\n');
                 if(item_owned[POKEBALL] < 1) {
                     puts("Pokeball tidak cukup");
                     continue;
@@ -427,6 +445,7 @@ int main() {
 
                 break;
             case ITEM:
+                putchar('\n');
                 if(item_owned[LULLABY_POWDER] < 1) {
                     puts("Anda tidak memiliki lullaby powder saat ini");
                     continue;
@@ -435,6 +454,8 @@ int main() {
                 item_owned[LULLABY_POWDER] -= 1;
 
                 shared_array[IS_LULLABY_USED] = TRUE;
+
+                puts("\nBerhasil menggunakan Lullaby Powder, apabila belum kelihatan efeknya silahkan refresh");
 
                 break;
             case KELUAR_DARI_CAPTURE:

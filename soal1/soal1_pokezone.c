@@ -100,28 +100,14 @@ void * itemAdding(void * ptr) {
     int i;
     while (TRUE)
     {
-        for ( i = 0; i < 10; i++)
+        for ( i = 0; i < 30; i++)
         {
             if((shared_array[LULLABY_STORE_NUM] + shared_array[BERRY_STORE_NUM] + shared_array[POKEBALL_STORE_NUM]) >= 200) break;
 
-            shared_array[LULLABY_STORE_NUM] += 1;
+            shared_array[i % 3] += 1;
         }
 
-        for ( i = 0; i < 10; i++)
-        {
-            if((shared_array[LULLABY_STORE_NUM] + shared_array[BERRY_STORE_NUM] + shared_array[POKEBALL_STORE_NUM]) >= 200) break;
-
-            shared_array[POKEBALL_STORE_NUM] += 1;
-        }
-
-        for ( i = 0; i < 10; i++)
-        {
-            if((shared_array[LULLABY_STORE_NUM] + shared_array[BERRY_STORE_NUM] + shared_array[POKEBALL_STORE_NUM]) >= 200) break;
-
-            shared_array[BERRY_STORE_NUM] += 1;
-        }
-
-        testingSharedArray();
+        // testingSharedArray();
         sleep(10);
     }
     
@@ -177,7 +163,7 @@ void * randomPokemon( void * ptr) {
             shared_array[NEW_CAPTURE_RATE] -= 20;
             shared_array[NEW_POKEDOLLAR] += 5000;
         }
-        
+
         sleep(1);
     }
     return NULL;
