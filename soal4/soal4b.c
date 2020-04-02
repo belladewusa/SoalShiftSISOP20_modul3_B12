@@ -8,16 +8,16 @@
 #define X1 4
 #define X2 5
 
-long double result[X1][X2];
+int result[X1][X2];
 void *factorial( void *ptr );
 
 int main()
 {
     key_t key = 1234;
-    unsigned long long int *res; 
+    int *res; 
     int i, j;
 
-    int shmid = shmget(key, sizeof(unsigned long long int)*X1*X2, IPC_CREAT | 0666), iret[X1][X2];
+    int shmid = shmget(key, sizeof(int)*X1*X2, IPC_CREAT | 0666), iret[X1][X2];
     res = shmat(shmid, NULL, 0);
 
     pthread_t threads[X1][X2];
@@ -26,7 +26,7 @@ int main()
     {
         for ( j = 0; j < X2; j++)
         {
-            result[i][j] = 0.0;
+            result[i][j] = 0;
         }
         
     }
@@ -53,13 +53,12 @@ int main()
     for (i = 0; i < X1; i++)
     {
         for ( j = 0; j < X2 - 1; j++)
-        {   
-            printf("%.0Lf\t", result[i][j]);
-        }
-        printf("%.0Lf\n", result[i][X2 - 1]);
+            printf("%-8d", result[i][j]);
+        
+        printf("%-8d\n", result[i][X2 - 1]);
     }
     
-    sleep(5);
+    sleep(3);
 
     shmdt(res);
     shmctl(shmid, IPC_RMID, NULL);
@@ -70,11 +69,15 @@ void *factorial( void *ptr )
     int *param = (int *)ptr, i;
     // printf("%d\n", param[0]);
     if(param[0] < 1){
-        result[param[1]][param[2]] = 1;
+        result[param[1]][param[2]] = 0;
+        return NULL;
     }
-    result[param[1]][param[2]] = 1;
-    for ( i = 1; i < param[0]; i++)
+
+    result[param[1]][param[2]] = 0;
+    for ( i = 1; i <= param[0]; i++)
     {
-        result[param[1]][param[2]] *= i;
+        result[param[1]][param[2]] += i;
     }
+
+    return NULL;
 }

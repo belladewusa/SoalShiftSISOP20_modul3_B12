@@ -15,29 +15,29 @@ void *multiply( void *ptr );
 int main()
 {
     key_t key = 1234;
-    unsigned long long int *res;
+    int *res;
     int i, j, k;
 
-    int shmid = shmget(key, sizeof(unsigned long long int)*X1*X2, IPC_CREAT | 0666);
+    int shmid = shmget(key, sizeof(int)*X1*X2, IPC_CREAT | 0666);
     res = shmat(shmid, NULL, 0);
 
     pthread_t threads[X1][X2][Y];
     int  iret[X1][X2][Y], number1[X1][Y]= {
-            {3, 3}, 
-            {3, 3}, 
-            {3, 3},
-            {3, 3}
+            {20, 20}, 
+            {20, 20}, 
+            {20, 20},
+            {20, 20}
         }, 
         number2[Y][X2] = {
-            {3, 3, 3, 3, 3}, 
-            {3, 3, 3, 3, 3}
+            {20, 20, 20, 20, 20}, 
+            {20, 20, 20, 20, 20}
         };
 
     for (i = 0; i < X1; i++)
     {
         for (j = 0; j < X2; j++)
         {
-            res[i* X1 + j] = 0;
+            res[j* X2 + i] = 0;
         }
     }
     
@@ -72,7 +72,6 @@ int main()
                 // printf("%d %d - %d %d -> %d %llu\n", i, j, j, k, (int)ress, res[k* X2 + i]);
                 res[k*X2 + i] += (int)ress;
             }
-            
         }
     }
     
@@ -80,13 +79,11 @@ int main()
     for (i = 0; i < X1; i++)
     {
         for ( j = 0; j < X2 - 1; j++)
-        {
-            printf("%llu\t", res[j * X2 + i]);
-        }
-        printf("%llu\n", res[j * X2 + X1 - 1]);
+            printf("%-8d", res[j * X2 + i]);
+        printf("%-8d\n", res[j * X2 + X1 - 1]);
     }
 
-    sleep(10);
+    sleep(3);
 
     shmdt(res);
     shmctl(shmid, IPC_RMID, NULL);
