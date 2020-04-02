@@ -121,8 +121,6 @@ void *cariPokemon(void * ptr) {
 
     while (TRUE)
     {
-        if(!is_cari_pokemon) break;
-    
         sleep(10);
         
         if(!is_cari_pokemon) break;
@@ -145,10 +143,9 @@ void *cariPokemon(void * ptr) {
             shared_array[OLD_POKEDOLLAR] = shared_array[NEW_POKEDOLLAR];
             shared_array[OLD_CAPTURE_RATE] = shared_array[NEW_CAPTURE_RATE];
 
-            break;
+            return NULL;
         } 
     }
-    return NULL;
 }
 
 void * pokemonRun(void *ptr) {
@@ -165,10 +162,9 @@ void * pokemonRun(void *ptr) {
             
             is_capture_mode = FALSE;
 
-            break;
+            return NULL;
         }
     }
-    return NULL;
 }
 
 void * pokemonThread(void * ptr) {
@@ -189,11 +185,10 @@ void * pokemonThread(void * ptr) {
 
                 pokemon_owned[index] = FALSE;
                 count_pokemon_owned--;
-                break;
             }else affection_point[index] = 50;
+            return NULL;
         }
     }
-    return NULL;
 }
 
 int main() {
@@ -223,8 +218,8 @@ int main() {
     {
                         
         printf("\nPokedollar dimiliki : %d\nPokemon dimiliki : %d\nItem dimiliki : %d\n", pokedollar_owned, count_pokemon_owned, item_owned[BERRY] + item_owned[LULLABY_POWDER] + item_owned[POKEBALL]);
-        puts("Menu :");
         if(!is_capture_mode) {
+            puts("Menu :");
             if(!is_cari_pokemon)puts("1.Cari Pokemon");
             else puts("1.Berhenti Mencari");
             puts("2.Pokedex\n3.Shop");
@@ -232,7 +227,7 @@ int main() {
             printf("Input (tuliskan menu) : ");
 
             gets(input);
-            if(is_capture_mode)continue;
+            if(is_capture_mode) continue;
             input_num = checkInput(input);
 
             switch (input_num)
@@ -248,11 +243,14 @@ int main() {
                 int iret_pencarian;
 
                 is_cari_pokemon = TRUE;
+
                 iret_pencarian = pthread_create(&thread_pencarian, NULL, cariPokemon, NULL);
                 if(iret_pencarian) {
                     fprintf(stderr,"Error - pthread_create() return code: %d\n",iret_pencarian);
                     exit(EXIT_FAILURE);
                 }
+
+                puts("Jika muncul pesan \"Menemukan Pokemon!!\" silahkan berikan input seperti perintah yang sebelumnya, setelahnya anda akan berpindah ke capture mode");
 
                 break;
             case BERHENTI_MENCARI:
@@ -273,7 +271,7 @@ int main() {
                 for ( i = 0; i < 7; i++)
                 {
                     if(pokemon_owned[i]) {
-                        printf("%d. Pokemon : %s | AP : %d", i, pokemon[index_pokemon[i][0]][index_pokemon[i][1]], affection_point[i]);
+                        printf("%d. Pokemon : %s | AP : %d\n", i, pokemon[index_pokemon[i][0]][index_pokemon[i][1]], affection_point[i]);
                     }
                 }
 
@@ -281,6 +279,7 @@ int main() {
                 printf("Input : ");
 
                 gets(input);
+                if(is_capture_mode) continue;
 
                 input_num = checkInput(input);
 
@@ -368,6 +367,8 @@ int main() {
                 is_first_encounter = FALSE;
             }
 
+            
+            puts("Menu :");
             puts("1.Tangkap\n2.Item\n3.Keluar dari capture");
             printf("Input (tuliskan menu) : ");
 
@@ -419,7 +420,7 @@ int main() {
                                 fprintf(stderr,"Error - pthread_create() return code: %d\n",iret);
                                 exit(EXIT_FAILURE);
                             }
-                            continue;
+                            break;
                         }
                     }
                 }else puts("Gagal menangkap");

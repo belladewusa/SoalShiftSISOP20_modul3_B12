@@ -121,7 +121,7 @@ void * itemAdding(void * ptr) {
             shared_array[BERRY_STORE_NUM] += 1;
         }
 
-        // testingSharedArray();
+        testingSharedArray();
         sleep(10);
     }
     
@@ -161,20 +161,23 @@ void * randomPokemon( void * ptr) {
         else if(random_num < 95) shared_array[INDEX_X_POKEMON] = 1;
         else shared_array[INDEX_X_POKEMON] = 2;
 
+        random_num = rand() % 5;
+
+        shared_array[INDEX_Y_POKEMON] = random_num;
+
         shared_array[NEW_ESCAPE_RATE] = escape_rate[shared_array[INDEX_X_POKEMON]];
         shared_array[NEW_CAPTURE_RATE] = capture_rate[shared_array[INDEX_X_POKEMON]];
         shared_array[NEW_POKEDOLLAR] = pokedollar[shared_array[INDEX_X_POKEMON]];
 
-        // random_num = rand() % 8000;
-        random_num = rand() % 10;
-
-        // if(random_num == 77) {
-        if(random_num < 5) {
+        // random_num = rand() % 10;
+        // if(random_num < 5) {
+        random_num = rand() % 8000;
+        if(random_num == 77) {
             shared_array[NEW_ESCAPE_RATE] += 5;
             shared_array[NEW_CAPTURE_RATE] -= 20;
             shared_array[NEW_POKEDOLLAR] += 5000;
         }
-
+        
         sleep(1);
     }
     return NULL;
@@ -243,14 +246,10 @@ int main() {
         puts("Input salah");   
     }
 
-    int status;
     pid_t shutdown = fork();
 
     if(shutdown == 0) {
         char *arr[] = {"pkill","-f","soal1_traizone",NULL};
-        execv("/bin/pkill",arr);
-    }else {
-        char *arr[] = {"pkill","-f","soal1_pokezone",NULL};
         execv("/bin/pkill",arr);
     }
 
