@@ -82,21 +82,6 @@ int item_owned[3];
 int encountered_pokemon[2];
 int item_cost[] = {60, 5, 15};
 
-void testingSharedArray() {
-    printf("LULLABY_STORE_NUM %d\n", shared_array[LULLABY_STORE_NUM]);
-    printf("POKEBALL_STORE_NUM %d\n", shared_array[POKEBALL_STORE_NUM]);
-    printf("BERRY_STORE_NUM %d\n", shared_array[BERRY_STORE_NUM]);
-    printf("INDEX_X_POKEMON %d\n", shared_array[INDEX_X_POKEMON]);
-    printf("INDEX_Y_POKEMON %d\n", shared_array[INDEX_Y_POKEMON]);
-    printf("NEW_ESCAPE_RATE %d\n", shared_array[NEW_ESCAPE_RATE]);
-    printf("NEW_CAPTURE_RATE %d\n", shared_array[NEW_CAPTURE_RATE]);
-    printf("NEW_POKEDOLLAR %d\n", shared_array[NEW_POKEDOLLAR]);
-    printf("OLD_ESCAPE_RATE %d\n", shared_array[OLD_ESCAPE_RATE]);
-    printf("OLD_CAPTURE_RATE %d\n", shared_array[OLD_CAPTURE_RATE]);
-    printf("OLD_POKEDOLLAR %d\n", shared_array[OLD_POKEDOLLAR]);
-    printf("IS_LULLABY_USED %d\n", shared_array[IS_LULLABY_USED]);
-}
-
 int checkInput(char *str) {
     int length = strlen(str), i;
 
@@ -109,7 +94,7 @@ int checkInput(char *str) {
     else if(!strcmp("shop", str)) return SHOP;
     else if(!strcmp("tangkap", str)) return TANGKAP;
     else if(!strcmp("item", str)) return ITEM;
-    else if(!strcmp("keluar dari capture", str)) return KELUAR_DARI_CAPTURE;
+    else if(!strcmp("keluar", str)) return KELUAR_DARI_CAPTURE;
     else if(!strcmp("lepas pokemon", str)) return LEPAS_POKEMON;
     else if(!strcmp("beri berry", str)) return BERI_BERRY;
 
@@ -174,12 +159,10 @@ void * pokemonThread(void * ptr) {
     while (TRUE)
     {
         sleep(10);
-        // sleep(1000);
 
         if(!pokemon_owned[index]) return NULL;
 
         if(!is_capture_mode) affection_point[index] -= 10;
-        // printf("AF -> %d", affection_point[index]);
 
         if(affection_point[index] <= 0) {
             int random_number = rand() % 100;
@@ -363,7 +346,6 @@ int main() {
                 shared_array[index_item] -= jumlah;
                 pokedollar_owned -= (jumlah * item_cost[index_item]);
 
-                // testingSharedArray();
                 break;
             default:
                 if(!is_capture_mode) puts("Input salah");
@@ -385,7 +367,7 @@ int main() {
 
             printf("Escape Rate : %d/100 \nCapture Rate : %d/100 ", shared_array[OLD_ESCAPE_RATE], shared_array[OLD_CAPTURE_RATE]);
             puts("\nMenu :");
-            puts("1.Tangkap\n2.Item\n3.Keluar dari capture");
+            puts("1.Tangkap\n2.Item\n3.Keluar\nUntuk ketik selain perintah di menu");
             printf("Input (tuliskan menu) : ");
 
             gets(input);
@@ -446,8 +428,16 @@ int main() {
                 break;
             case ITEM:
                 putchar('\n');
+
+                if(!is_capture_mode) continue;
+                
                 if(item_owned[LULLABY_POWDER] < 1) {
                     puts("Anda tidak memiliki lullaby powder saat ini");
+                    continue;
+                }
+
+                if(shared_array[OLD_CAPTURE_RATE] >= 100) {
+                    puts("Capture Rate sudah full");
                     continue;
                 }
 

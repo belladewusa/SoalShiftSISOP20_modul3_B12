@@ -16,18 +16,9 @@
 #include <time.h>
 #include <sys/prctl.h>
 
-//Menu
+//General
 #define FALSE 0
 #define TRUE 1
-#define CARI_POKEMON 2
-#define POKEDEX 3
-#define SHOP 4
-#define BERHENTI_MENCARI 5
-#define TANGKAP 6
-#define ITEM 7
-#define KELUAR_DARI_CAPTURE 8
-#define LEPAS_POKEMON 9
-#define BERI_BERRY 10
 
 //Item
 #define LULLABY_POWDER 0
@@ -48,53 +39,13 @@
 #define OLD_POKEDOLLAR 10
 #define IS_LULLABY_USED 11
 
-char pokemon[3][5][100] = {
-    {
-        "Bulbasaur",
-        "Charmander",
-        "Squirtle",
-        "Rattata",
-        "Caterpie"
-    },
-    {
-        "Pikachu",
-        "Eevee",
-        "Jigglypuff",
-        "Snorlax",
-        "Dragonite"
-    },
-    {
-        "Mew",
-        "Mewtwo",
-        "Moltres",
-        "Zapdos",
-        "Articuno"
-    }
-};
-
-int encounter_rate[] = {80, 15, 5};
 int escape_rate[] = {5, 10, 20};
 int capture_rate[] = {70, 50, 30};
 int pokedollar[] = {80, 100, 200};
-int item_cost[] = {60, 5, 15};
 int *shared_array;
 int lullaby_check[100];
-
-void testingSharedArray() {
-    printf("LULLABY_STORE_NUM %d\n", shared_array[LULLABY_STORE_NUM]);
-    printf("POKEBALL_STORE_NUM %d\n", shared_array[POKEBALL_STORE_NUM]);
-    printf("BERRY_STORE_NUM %d\n", shared_array[BERRY_STORE_NUM]);
-    printf("INDEX_X_POKEMON %d\n", shared_array[INDEX_X_POKEMON]);
-    printf("INDEX_Y_POKEMON %d\n", shared_array[INDEX_Y_POKEMON]);
-    printf("NEW_ESCAPE_RATE %d\n", shared_array[NEW_ESCAPE_RATE]);
-    printf("NEW_CAPTURE_RATE %d\n", shared_array[NEW_CAPTURE_RATE]);
-    printf("NEW_POKEDOLLAR %d\n", shared_array[NEW_POKEDOLLAR]);
-    printf("OLD_ESCAPE_RATE %d\n", shared_array[OLD_ESCAPE_RATE]);
-    printf("OLD_CAPTURE_RATE %d\n", shared_array[OLD_CAPTURE_RATE]);
-    printf("OLD_POKEDOLLAR %d\n", shared_array[OLD_POKEDOLLAR]);
-    printf("IS_LULLABY_USED %d\n", shared_array[IS_LULLABY_USED]);
-    putchar('\n');
-}
+int count_lullaby_effect_running;
+int first_escape_rate;
 
 void * itemAdding(void * ptr) {
     int i;
@@ -107,7 +58,6 @@ void * itemAdding(void * ptr) {
             shared_array[i % 3] += 1;
         }
 
-        // testingSharedArray();
         sleep(10);
     }
     
@@ -117,7 +67,12 @@ void * itemAdding(void * ptr) {
 void * lullabyEffect(void * ptr) {
     int *param = (int *)ptr;
 
-    int i, count = 0, old_escape_rate;
+    int i, count = 0;
+
+    if(count_lullaby_effect_running <= 0)
+        first_escape_rate = shared_array[OLD_ESCAPE_RATE];
+    
+    count_lullaby_effect_running++;
 
     for ( i = 0; i < 20; i++)
     {
@@ -125,14 +80,17 @@ void * lullabyEffect(void * ptr) {
         shared_array[OLD_CAPTURE_RATE] += 1;
         count++;
     }
-    
-    old_escape_rate = shared_array[9];
+
     shared_array[OLD_ESCAPE_RATE] = 0;
-
+    
     sleep(10);
-
+        
     shared_array[OLD_CAPTURE_RATE] -= count;
-    shared_array[OLD_ESCAPE_RATE] = old_escape_rate;
+    
+    if(count_lullaby_effect_running == 1)
+        shared_array[OLD_ESCAPE_RATE] = first_escape_rate;
+
+    count_lullaby_effect_running--;
 
     lullaby_check[param[0]] = FALSE;
 
@@ -155,8 +113,6 @@ void * randomPokemon( void * ptr) {
         shared_array[NEW_CAPTURE_RATE] = capture_rate[shared_array[INDEX_X_POKEMON]];
         shared_array[NEW_POKEDOLLAR] = pokedollar[shared_array[INDEX_X_POKEMON]];
 
-        // random_num = rand() % 10;
-        // if(random_num < 5) {
         random_num = rand() % 8000;
         if(random_num == 77) {
             shared_array[NEW_ESCAPE_RATE] += 5;
@@ -175,6 +131,7 @@ int main() {
     int shmid = shmget(key, sizeof(int)*20, IPC_CREAT | 0666), i;
     shared_array = shmat(shmid, NULL, 0);
     int irett[2];
+    count_lullaby_effect_running = 0;
 
     pthread_t item_adding;
     pthread_t lullaby_effect[100];
@@ -200,6 +157,7 @@ int main() {
                 {
                     if(!lullaby_check[i]) {
                         lullaby_check[i] = TRUE;
+
                         int iret;
                         int arr[1] = {i};
 
