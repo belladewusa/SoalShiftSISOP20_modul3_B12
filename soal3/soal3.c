@@ -160,9 +160,7 @@ int main(int argc, char *argv[]) {
                 char temp[1000];
                 strcpy(temp, curr_dirr);
                 strcat(temp, ep->d_name);
-                // printf("%s\n", temp);
                 if(strcmp(".",ep->d_name) !=0 && strcmp("..",ep->d_name) != 0 && !isDirectory(temp)) {
-                    // printf("Masuk -> %s\n", ep->d_name);
                     strcpy(temp, argv[2]);
                     if(argv[2][strlen(argv[2]) - 1] != '/') strcat(temp, "/");
                     strcat(temp, ep->d_name);
