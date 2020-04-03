@@ -1,6 +1,4 @@
 // gcc tapplayer.c -pthread -o tapplayer
-// do sudo apt-get install libncurses5-dev
-// then "sudo apt install ncurses-doc" to see man ncurses for doc
 #include <stdio.h> 
 #include <sys/socket.h> 
 #include <arpa/inet.h> 
@@ -9,7 +7,6 @@
 #include <ctype.h>
 #include <sys/types.h> 
 #include <sys/wait.h>
-// #include <curses.h>
 #include <pthread.h>
 #include <stdlib.h>
 #include <termios.h>
@@ -64,23 +61,13 @@ int checkInput(char *input) {
     return FALSE;
 }
 
-void clearscr ( void )
-{
-    int i;
-    for ( i = 0; i < 50; i++ )
-        putchar('\n');
-}
-
 void *loop( void *ptr )
 {
-    // int i = 0;
     while (status == TRUE)
     {
-        // printf("Waiting for player ... %d\n", status);
         if(status == BATTLE || status == FALSE)break;
         puts("Waiting for player ...");
         sleep(1);
-        // i++;
     } 
     return NULL;
 }
@@ -91,8 +78,6 @@ void *receiveInput( void *ptr )
     memset(buffer, FALSE, sizeof(buffer));
 
     while((valread = read(sock, buffer, 1024))) {
-        // clear();
-
         if(!strcmp(buffer, "win")) {
             printf("Game berakhir kamu menang\n");
             status = WIN;
@@ -106,7 +91,6 @@ void *receiveInput( void *ptr )
         }
 
         printf("%s\n", buffer);
-        // printf("%s\n", buffer);
 
         memset(buffer, FALSE, sizeof(buffer));
     }
@@ -152,9 +136,6 @@ int main(int argc, char const *argv[])
         memset(buffer, FALSE, sizeof(buffer));
         memset(message, FALSE, sizeof(message));
 
-        // if(flag != BATTLE)clearscr();
-        // else flag = FALSE;
-
         if(flag != FALSE) {
             if(flag == AUTHENTICATED){
                 printf("Sudah Login\n");
@@ -164,8 +145,8 @@ int main(int argc, char const *argv[])
             flag = FALSE;
         }
 
-        if(!is_login)printf("1.Login\n2.Register\nChoices : ");
-        else printf("1.Find Match\n2.Logout\nChoices : ");
+        if(!is_login)printf("\n1.Login\n2.Register\nChoices : ");
+        else printf("\n1.Find Match\n2.Logout\nChoices : ");
         
         gets(message);
         int input = checkInput(message);
@@ -184,18 +165,29 @@ int main(int argc, char const *argv[])
             
             printf("Username : ");
             gets(message);
-            // puts(message);
+            
+            if(strlen(message) < 1){
+                puts("Input salah atau harus lebih dari 1 karakter");
+                continue;
+            }
+
             send(sock , message , strlen(message) , 0 );
             memset(message, FALSE, sizeof(message));
 
             printf("Password : ");
             gets(message);
-            // puts(message);
+            
+            if(strlen(message) < 1){
+                puts("Input salah atau harus lebih dari 1 karakter");
+                continue;
+            }
+            
             send(sock , message , strlen(message) , 0 );
             memset(message, FALSE, sizeof(message));
             
             valread = read(sock, buffer, 1024);
             puts(buffer);
+
             if(!strcmp("login success", buffer)) is_login = TRUE;
 
             break;
@@ -210,13 +202,23 @@ int main(int argc, char const *argv[])
             
             printf("Username : ");
             gets(message);
-            // puts(message);
+            
+            if(strlen(message) < 1){
+                puts("Input salah atau harus lebih dari 1 karakter");
+                continue;
+            }
+
             send(sock , message , strlen(message) , 0 );
             memset(message, FALSE, sizeof(message));
 
             printf("Password : ");
             gets(message);
-            // puts(message);
+
+            if(strlen(message) < 1){
+                puts("Input salah atau harus lebih dari 1 karakter");
+                continue;
+            }
+
             send(sock , message , strlen(message) , 0 );
             memset(message, FALSE, sizeof(message));
 

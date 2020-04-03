@@ -81,8 +81,6 @@ int main(int argc, char const *argv[])
 			exit(EXIT_FAILURE); 
 		}
 
-		// printf("New Client : %d\n", new_socket[i]);
-
 		void *ress;
 		int arr[1] = {new_socket[i]};
 
@@ -117,7 +115,6 @@ void *client_thread(void *ptr) {
 
 	while ((valread = recv(client_addr , buffer , 1024 , 0)) > 0)
 	{
-		// printf("%d %s\n", client_addr,buffer );
         if(!strcmp("login", buffer)) {
             fptr = fopen("akun.txt","rb");
             int flag = FALSE;
@@ -131,8 +128,6 @@ void *client_thread(void *ptr) {
 
                 while(fread(temp, sizeof(temp), 2, fptr))
                 {
-                    // puts(temp[0]);
-                    // puts(temp[1]);
                     if(!strcmp(temp[0], username) && !strcmp(temp[1], password)) {
                         flag = TRUE;
                         send(client_addr , "login success" , strlen("login success") , 0 );
@@ -174,7 +169,6 @@ void *client_thread(void *ptr) {
                 fclose(fptr);
             }
         }else if(!strcmp("waiting for player", buffer)) {
-            // printf("searching -> %d\n", searching);
             int opponent_addr;
             if(searching == -1){
                 searching = client_addr;
