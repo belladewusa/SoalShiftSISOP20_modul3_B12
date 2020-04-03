@@ -1,4 +1,4 @@
-// C program to demonstrate use of fork() and pipe() 
+// gcc -pthread -o soal4c soal4c.c
 #include<stdio.h> 
 #include<stdlib.h> 
 #include<unistd.h> 
@@ -34,8 +34,6 @@ int main()
 
 	if( p == 0 )
 	{ 
-		// READ 0
-		// WRITE 1
 		int status;
 
 		pid_t child = fork();
@@ -52,5 +50,7 @@ int main()
         dup2(fd1[READ], STDIN_FILENO);
 		char *arr[] = {"wc","-l", NULL};
 		execvp("/bin/wc", arr);
-	} 
+	}
+
+	exit(EXIT_SUCCESS);
 } 

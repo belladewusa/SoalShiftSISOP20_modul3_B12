@@ -1,4 +1,4 @@
-//gcc -pthread -o [output] input.c
+//gcc -pthread -o soal4a soal4a.c
 #include <stdio.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
@@ -69,7 +69,7 @@ int main()
             {
                 void *ress;
                 pthread_join(threads[i][k][j], &ress);
-                // printf("%d %d - %d %d -> %d %llu\n", i, j, j, k, (int)ress, res[k* X2 + i]);
+                
                 res[k*X2 + i] += (int)ress;
             }
         }
@@ -94,6 +94,6 @@ void *multiply( void *ptr )
     int ress;
     int *param = (int *)ptr;
     ress = param[0]*param[1];
-    // printf("%d %d - Function -> %d\n",param[0], param[1], ress);
+    
     return (void *) ress;
 }

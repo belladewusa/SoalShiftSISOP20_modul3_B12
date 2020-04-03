@@ -1,3 +1,4 @@
+// gcc -pthread -o soal4b soal4b.c
 #include <stdio.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
@@ -25,10 +26,7 @@ int main()
     for ( i = 0; i < X1; i++)
     {
         for ( j = 0; j < X2; j++)
-        {
             result[i][j] = 0;
-        }
-        
     }
     
 
@@ -37,8 +35,8 @@ int main()
         for (j = 0; j < X2; j++)
         {
             int arr[3] = {res[j * X2 + i], i, j};
+
             iret[i][j] = pthread_create(&threads[i][j], NULL, factorial, arr);
-            // printf("%d %d %d-> %llu -> SHMID\n",i*X1+j, i, j,res[j * X2 + i]);
 
             if(iret[i][j]) //jika eror
             {
@@ -54,7 +52,6 @@ int main()
     {
         for ( j = 0; j < X2 - 1; j++)
             printf("%-8d", result[i][j]);
-        
         printf("%-8d\n", result[i][X2 - 1]);
     }
     
@@ -67,13 +64,14 @@ int main()
 void *factorial( void *ptr )
 {
     int *param = (int *)ptr, i;
-    // printf("%d\n", param[0]);
+
     if(param[0] < 1){
         result[param[1]][param[2]] = 0;
         return NULL;
     }
 
     result[param[1]][param[2]] = 0;
+
     for ( i = 1; i <= param[0]; i++)
     {
         result[param[1]][param[2]] += i;
