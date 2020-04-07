@@ -149,8 +149,12 @@ void *client_thread(void *ptr) {
             char temp[2][1024];
             
             memset(buffer, FALSE, sizeof(buffer));
+
+            memset(temp[0], FALSE, sizeof(temp[0]));
+            memset(temp[1], FALSE, sizeof(temp[1]));
             
             valread = recv(client_addr , temp[0] , 1024 , 0);
+
             valread = recv(client_addr , temp[1] , 1024 , 0);
 
             send(client_addr , "register success" , strlen("register success") , 0 );
@@ -203,8 +207,8 @@ void *client_thread(void *ptr) {
                 }
 
                 if(health[client_addr] <= 0) {
-                    send(client_addr, "lose", strlen("lose"), 0);
-                    send(opponent_addr, "win", strlen("win"), 0);
+                    // send(client_addr, "lose", strlen("lose"), 0);
+                    // send(opponent_addr, "win", strlen("win"), 0);
                     break;
                 }
 

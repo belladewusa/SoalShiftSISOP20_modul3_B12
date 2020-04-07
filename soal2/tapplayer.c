@@ -80,14 +80,16 @@ void *receiveInput( void *ptr )
     while((valread = read(sock, buffer, 1024))) {
         if(!strcmp(buffer, "win")) {
             printf("Game berakhir kamu menang\n");
+            memset(buffer, FALSE, sizeof(buffer));
             status = WIN;
-            break;
+            return NULL;
         }
 
         if(!strcmp(buffer, "lose")) {
             printf("Game berakhir kamu kalah\n");
+            memset(buffer, FALSE, sizeof(buffer));
             status = LOSE;
-            break;
+            return NULL;
         }
 
         printf("%s\n", buffer);
@@ -198,7 +200,8 @@ int main(int argc, char const *argv[])
                 continue;
             }
 
-            send(sock , "register" , strlen("register") , 0 ); 
+            send(sock , "register" , strlen("register") , 0 );
+            memset(message, FALSE, sizeof(message)); 
             
             printf("Username : ");
             gets(message);

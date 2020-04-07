@@ -22,6 +22,13 @@ int main()
     res = shmat(shmid, NULL, 0);
 
     pthread_t threads[X1][X2];
+
+    for (i = 0; i < X1; i++)
+    {
+        for ( j = 0; j < X2 - 1; j++)
+            printf("%-8d", res[j * X2 + i]);
+        printf("%-8d\n", res[4 * X2 + i]);
+    }
     
     for ( i = 0; i < X1; i++)
     {
